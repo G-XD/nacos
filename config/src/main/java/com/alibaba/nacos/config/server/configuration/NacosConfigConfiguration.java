@@ -17,9 +17,9 @@
 package com.alibaba.nacos.config.server.configuration;
 
 import com.alibaba.nacos.config.server.filter.CircuitFilter;
-import com.alibaba.nacos.config.server.filter.ConfigParamCheckFilter;
 import com.alibaba.nacos.config.server.filter.NacosWebFilter;
 import com.alibaba.nacos.persistence.configuration.condition.ConditionDistributedEmbedStorage;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -35,6 +35,7 @@ import org.springframework.context.annotation.Configuration;
 public class NacosConfigConfiguration {
     
     @Bean
+    @ConditionalOnProperty(name = "nacos.web.charset.filter", havingValue = "nacos", matchIfMissing = true)
     public FilterRegistrationBean<NacosWebFilter> nacosWebFilterRegistration() {
         FilterRegistrationBean<NacosWebFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(nacosWebFilter());
@@ -66,19 +67,4 @@ public class NacosConfigConfiguration {
         return new CircuitFilter();
     }
     
-    @Bean
-    public FilterRegistrationBean<ConfigParamCheckFilter> configParamCheckFilterRegistration() {
-        FilterRegistrationBean<ConfigParamCheckFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(configParamCheckFilter());
-        registration.addUrlPatterns("/v1/cs/*");
-        registration.addUrlPatterns("/v2/cs/*");
-        registration.setName("configparamcheckfilter");
-        registration.setOrder(8);
-        return registration;
-    }
-    
-    @Bean
-    public ConfigParamCheckFilter configParamCheckFilter() {
-        return new ConfigParamCheckFilter();
-    }
 }
